@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EcoMonitor-BR - Dashboard de monitoramento climático em tempo real das principais capitais brasileiras">
+    <meta name="keywords" content="clima, monitoramento, Brasil, tempo real, sustentabilidade">
+    <meta name="author" content="Bruno">
+    <title>EcoMonitor-BR | Dashboard Climático em Tempo Real</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🌿</span>
+                    <h1 class="logo-text">EcoMonitor-BR</h1>
+                </div>
+                <p class="subtitle">Monitoramento Climático em Tempo Real</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Control Panel -->
+            <section class="control-panel">
+                <div class="search-group">
+                    <label for="city-search" class="selector-label">
+                        <span class="label-icon">🔍</span>
+                        Buscar Cidade:
+                    </label>
+                    <div class="search-wrapper">
+                        <input 
+                            type="text" 
+                            id="city-search" 
+                            class="city-search" 
+                            placeholder="Digite o nome da cidade..."
+                            autocomplete="off"
+                        />
+                        <button id="search-btn" class="search-btn" title="Buscar">
+                            <span>🔍</span>
+                        </button>
+                        <div id="search-results" class="search-results"></div>
+                    </div>
+                </div>
+                <div class="search-group compare-group">
+                    <label for="compare-search" class="selector-label">
+                        <span class="label-icon">🧭</span>
+                        Comparar com (opcional):
+                    </label>
+                    <div class="search-wrapper">
+                        <input 
+                            type="text" 
+                            id="compare-search" 
+                            class="city-search" 
+                            placeholder="Buscar outra cidade para comparar..."
+                            autocomplete="off"
+                        />
+                        <button id="compare-btn" class="search-btn" title="Buscar cidade para comparar">
+                            <span>➕</span>
+                        </button>
+                        <div id="compare-results" class="search-results"></div>
+                    </div>
+                    <button id="clear-compare" class="ghost-btn" type="button">Limpar comparação</button>
+                </div>
+                <div class="info-badge">
+                    <span class="badge-icon">🔄</span>
+                    <span id="last-update">Carregando dados...</span>
+                </div>
+            </section>
+
+            <!-- Current City Display -->
+            <section class="current-city">
+                <h2 class="current-city-title">
+                    <span class="city-pin">📌</span>
+                    <span id="current-city-name">São Paulo</span>
+                </h2>
+            </section>
+
+            <!-- Weather Cards -->
+            <section class="weather-cards">
+                <article class="weather-card temperature">
+                    <div class="card-header">
+                        <span class="card-icon">🌡️</span>
+                        <h2 class="card-title">Temperatura</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-value" id="temperature-value">--°C</p>
+                        <p class="card-label">Atual</p>
+                    </div>
+                </article>
+
+                <article class="weather-card aqi">
+                    <div class="card-header">
+                        <span class="card-icon">🌫️</span>
+                        <h2 class="card-title">Qualidade do Ar</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-value" id="aqi-value">--</p>
+                        <p class="card-label" id="aqi-status">Aguardando dados</p>
+                    </div>
+                </article>
+
+                <article class="weather-card humidity">
+                    <div class="card-header">
+                        <span class="card-icon">💧</span>
+                        <h2 class="card-title">Umidade</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-value" id="humidity-value">--%</p>
+                        <p class="card-label">Relativa</p>
+                    </div>
+                </article>
+
+                <article class="weather-card wind">
+                    <div class="card-header">
+                        <span class="card-icon">💨</span>
+                        <h2 class="card-title">Vento</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-value" id="wind-value">-- km/h</p>
+                        <p class="card-label">Velocidade</p>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <article class="chart-container">
+                    <div class="chart-header">
+                        <h2 class="chart-title">📊 Dados Climáticos (Últimas 24 Horas)</h2>
+                        <div id="compare-badge" class="compare-badge" hidden>
+                            <span class="compare-dot"></span>
+                            Comparando com <span id="compare-city-name"></span>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="weather-chart"></canvas>
+                    </div>
+                </article>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">
+                    Dados fornecidos por 
+                    <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" class="footer-link">Open-Meteo API</a>
+                </p>
+                <p class="footer-copyright">
+                    &copy; 2025 EcoMonitor-BR | Bruno Vasconcellos 🌍
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/script.js"></script>
+</body>
+</html>
