@@ -1,171 +1,263 @@
-# 🌿 EcoMonitor-BR
+# EcoMonitor 2.0
 
-Dashboard de monitoramento climático em tempo real de **qualquer cidade** (busca global), com comparação lado a lado e qualidade do ar.
+O EcoMonitor é um dashboard climático global que reúne condições meteorológicas, qualidade do ar, previsão horária e previsão semanal em uma interface única. A aplicação funciona diretamente no navegador, não exige cadastro e utiliza somente APIs públicas e gratuitas.
 
-## 📋 Sobre o Projeto
+![Dashboard do EcoMonitor 2.0](docs/images/ecomonitor-2.0-dashboard.png)
 
-**EcoMonitor-BR** é um projeto de portfólio focado em "Tech for Good", que disponibiliza dados climáticos (temperatura, umidade, vento) e **qualidade do ar (US AQI)** em tempo real, com visualização interativa e comparação entre duas cidades.
+## Acesso
 
-## 🎯 Objetivos
+O projeto será publicado na Vercel. Depois do deploy, ele poderá ser acessado pelo endereço fornecido na página do projeto, normalmente no formato:
 
-- **Sustentabilidade**: Promover consciência ambiental através da visualização de dados climáticos
-- **Acessibilidade**: Interface responsiva e fácil de usar
-- **Educação**: Democratizar o acesso a informações meteorológicas
-- **Portfolio**: Demonstrar habilidades em Frontend e Data Visualization
-
-## 🛠️ Stack Tecnológica
-
-- **HTML5**: Marcação semântica e estruturada
-- **CSS3**: Estilização moderna com Flexbox e Grid Layout
-- **JavaScript ES6+**: Lógica de aplicação puramente vanilla (sem frameworks)
-- **Chart.js**: Biblioteca de visualização de dados
-- **Open-Meteo API**: Fonte de dados meteorológicos (gratuita e sem chave de API)
-
-## 📁 Estrutura do Projeto
-
+```text
+https://nome-do-projeto.vercel.app
 ```
+
+O endereço definitivo deve ser adicionado aqui assim que o primeiro deploy for concluído.
+
+Para executar localmente, siga a seção [Instalação local](#instalação-local).
+
+## Principais recursos
+
+- Busca de cidades em qualquer país.
+- Temperatura atual e sensação térmica.
+- Umidade, precipitação, velocidade e direção do vento.
+- Condição meteorológica traduzida para português.
+- Identificação de dia ou noite e horário local da cidade.
+- Previsão das próximas 24 horas com gráfico interativo.
+- Previsão dos próximos sete dias com mínima, máxima, chuva, nascer e pôr do sol.
+- US AQI, PM2.5 e PM10 com classificação e orientação ambiental.
+- Comparação entre duas cidades com resumo das diferenças.
+- Cidades favoritas e histórico de pesquisas recentes.
+- Unidades métricas e imperiais.
+- Temas claro, escuro e automático.
+- Uso opcional da localização fornecida pelo navegador.
+- Último resultado disponível quando não houver conexão.
+- Instalação como PWA em navegadores compatíveis.
+- Navegação por teclado e suporte a movimento reduzido.
+
+## Como usar
+
+### Consultar uma cidade
+
+1. Digite o nome no campo **Cidade observada**.
+2. Use as setas do teclado ou o mouse para escolher um resultado.
+3. Pressione `Enter` ou clique na cidade desejada.
+4. O painel será atualizado com os dados locais, a previsão e a qualidade do ar.
+
+Os horários são apresentados no fuso da própria cidade, mesmo quando ela estiver em outro país.
+
+### Comparar cidades
+
+1. Selecione a cidade principal.
+2. Digite outra localidade no campo **Comparar com**.
+3. Escolha um resultado diferente da cidade principal.
+4. Consulte as diferenças de temperatura, umidade e AQI.
+
+Os botões da área de comparação permitem inverter as cidades ou remover a comparação.
+
+### Favoritos, unidades e tema
+
+- Use **Favoritar** para guardar a cidade atual no navegador.
+- Abra as preferências no canto superior direito para trocar unidades e tema.
+- A opção **Remover dados locais** apaga favoritos, recentes, preferências e o último resultado salvo.
+
+### Usar a localização atual
+
+O botão de localização explica quais dados serão utilizados antes de abrir a solicitação de permissão do navegador. As coordenadas são enviadas somente à Open-Meteo para obter os dados climáticos e não são salvas no histórico de cidades.
+
+## Como o projeto funciona
+
+O EcoMonitor é uma aplicação estática construída com Vite e TypeScript. Não existe servidor próprio, banco de dados ou chave de API.
+
+O fluxo de uma consulta é:
+
+1. A API de geocodificação da Open-Meteo transforma o texto pesquisado em uma localidade com coordenadas e timezone.
+2. As APIs meteorológica e de qualidade do ar são consultadas em paralelo.
+3. As respostas são validadas e transformadas antes de chegarem à interface.
+4. Timestamps Unix são formatados com o timezone IANA da cidade.
+5. O estado da tela é atualizado e o Chart.js desenha as séries horárias.
+6. Preferências, favoritos, recentes e o último resultado ficam no `localStorage` do navegador.
+
+Cada campo de busca possui seu próprio debounce e `AbortController`. Quando uma nova pesquisa começa, a requisição anterior é cancelada e respostas atrasadas são ignoradas. Na comparação, as séries são alinhadas pelo timestamp em vez da posição no array.
+
+O service worker armazena apenas os arquivos estáticos da aplicação. Respostas das APIs não entram nesse cache. O último resultado é salvo separadamente e sempre aparece com um aviso quando estiver desatualizado.
+
+## Tecnologias
+
+- Vite 8
+- TypeScript 6
+- HTML semântico
+- CSS próprio
+- Chart.js 4
+- Vitest
+- Playwright
+- ESLint
+- Prettier
+- GitHub Actions
+
+Não são utilizados React, Vue, Angular, Tailwind ou bibliotecas completas de componentes.
+
+## Estrutura
+
+```text
 ecomonitor-br/
-│
-├── index.html          # Página principal
-├── css/
-│   └── style.css       # Estilos com tema Eco/Dark Mode
-├── js/
-│   └── script.js       # Lógica da aplicação (fetch, AQI, comparação)
-├── assets/             # Recursos (imagens, ícones futuros)
-├── README.md           # Documentação
-└── .gitignore          # Itens ignorados no controle de versão
+├── public/
+│   ├── icons/
+│   ├── manifest.webmanifest
+│   ├── og.png
+│   └── sw.js
+├── src/
+│   ├── api/
+│   ├── components/
+│   ├── services/
+│   ├── state/
+│   ├── styles/
+│   ├── types/
+│   ├── utils/
+│   └── main.ts
+├── tests/
+│   ├── e2e/
+│   └── unit/
+├── index.html
+├── package.json
+├── playwright.config.ts
+├── tsconfig.json
+└── vite.config.ts
 ```
 
-## 🚀 Funcionalidades
+### Organização do código
 
-### ✅ Implementadas
+- `src/api`: comunicação e validação das respostas da Open-Meteo.
+- `src/components`: combobox acessível e integração com o gráfico.
+- `src/services`: composição dos dados e persistência local.
+- `src/state`: estado central da aplicação.
+- `src/utils`: datas, AQI, unidades, códigos meteorológicos e validações auxiliares.
+- `src/styles`: identidade visual, responsividade e temas.
+- `tests/unit`: regressões de dados e transformações.
+- `tests/e2e`: fluxos completos em desktop e celular.
 
-- **Busca Global de Cidades**: Autocomplete via Open-Meteo Geocoding (sem chave)
-- **Qualidade do Ar (US AQI)**: Cartão dedicado com semáforo de saúde (bom, moderado, ruim)
-- **Modo Comparativo**: Sobreposição de duas cidades no mesmo gráfico (linhas tracejadas e badge de comparação)
-- **Gráfico Interativo 24h**: Temperatura, umidade e vento com múltiplos eixos
-- **Auto-atualização**: Refresh a cada 5 minutos para cidade principal e comparação
-- **Design Eco Dark Mode**: Layout responsivo, animações suaves e componentes acessíveis
+## Instalação local
 
-### 🎨 Design
+### Requisitos
 
-- **Paleta de Cores**:
-  - Verde principal: `#10b981` (Eco)
-  - Fundo escuro: `#0f172a` (Dark)
-  - Acentos: Laranja (temperatura), Azul (umidade), Roxo (vento)
-- **Tipografia**: System fonts para melhor performance
-- **Animações**: Transições suaves e micro-interações
-- **Responsividade**: Breakpoints em 768px e 480px
+- Node.js 24 ou superior
+- npm 11 ou superior
 
-## 📊 APIs Utilizadas
+A versão principal do Node está indicada no arquivo `.nvmrc`.
 
-**Open-Meteo Forecast** (meteo) — `https://api.open-meteo.com/v1/forecast`
-- `temperature_2m`: Temperatura a 2 metros do solo
-- `relative_humidity_2m`: Umidade relativa do ar
-- `wind_speed_10m`: Velocidade do vento a 10 metros
+### Executar
 
-**Open-Meteo Air Quality** (air-quality) — `https://air-quality-api.open-meteo.com/v1/air-quality`
-- `us_aqi`: Índice de qualidade do ar (US AQI)
-
-**Open-Meteo Geocoding** (geocoding) — `https://geocoding-api.open-meteo.com/v1/search`
-- Busca de cidades (name, latitude, longitude) — keyless
-
-> Todas as APIs são gratuitas e **não requerem chave**.
-
-## 🖥️ Como Executar
-
-### Opção 1: Servidor Local Simples
-
-1. Clone ou baixe o repositório
-2. Navegue até a pasta do projeto
-3. Execute um servidor HTTP local:
-
-**Python 3**:
 ```bash
-python -m http.server 8000
+git clone https://github.com/BrunoAV1/ecomonitor-br.git
+cd ecomonitor-br
+npm install
+npm run dev
 ```
 
-**Node.js (http-server)**:
+O Vite exibirá um endereço local, geralmente `http://localhost:5173`. Abra esse endereço no navegador.
+
+O arquivo `index.html` não deve ser aberto diretamente pelo sistema de arquivos, porque módulos, CSP e service worker dependem de HTTP ou HTTPS.
+
+## Scripts disponíveis
+
+| Comando                | Descrição                                     |
+| ---------------------- | --------------------------------------------- |
+| `npm run dev`          | Inicia o servidor de desenvolvimento          |
+| `npm run build`        | Gera o build de produção em `dist/`           |
+| `npm run preview`      | Abre uma prévia local do build                |
+| `npm run lint`         | Executa a análise estática                    |
+| `npm run typecheck`    | Valida os tipos TypeScript                    |
+| `npm test`             | Executa os testes unitários                   |
+| `npm run test:e2e`     | Executa os fluxos no Chromium                 |
+| `npm run format:check` | Confere a formatação                          |
+| `npm run check`        | Executa lint, tipos, testes unitários e build |
+
+Antes do primeiro teste end-to-end, instale o Chromium usado pelo Playwright:
+
 ```bash
-npx http-server -p 8000
+npx playwright install chromium
 ```
 
-**VS Code Live Server**:
-- Instale a extensão "Live Server"
-- Clique com o botão direito em `index.html`
-- Selecione "Open with Live Server"
+## Testes
 
-4. Acesse `http://localhost:8000` no navegador
+Os testes unitários cobrem:
 
-### Opção 2: Abrir Diretamente
+- classificação do US AQI;
+- timezone e seleção temporal;
+- unidades e direção do vento;
+- códigos meteorológicos WMO;
+- validação das respostas da Open-Meteo;
+- valores ausentes e séries com tamanhos diferentes.
 
-Como o projeto usa apenas JavaScript vanilla e APIs públicas, você pode abrir o arquivo `index.html` diretamente no navegador. Porém, alguns navegadores podem bloquear requisições CORS em arquivos locais.
+Os testes end-to-end cobrem desktop e celular, incluindo busca simultânea, navegação por teclado, comparação, favoritos, temas, unidades, privacidade da localização, recuperação do último resultado e responsividade.
 
-## 🔧 Configurações
+O workflow em `.github/workflows/ci.yml` executa lint, validação de tipos, testes, build e Playwright em cada push e pull request.
 
-### Intervalo de Atualização
+## Publicação na Vercel
 
-Edite em `js/script.js`:
+O projeto não precisa de variáveis de ambiente.
 
-```javascript
-const CONFIG = {
-    UPDATE_INTERVAL: 300000, // 5 minutos (em milissegundos)
-};
+### Pelo painel da Vercel
+
+1. Envie o repositório para o GitHub.
+2. Entre em [vercel.com](https://vercel.com) e escolha **Add New → Project**.
+3. Importe o repositório `ecomonitor-br`.
+4. Confirme o framework **Vite**.
+5. Use `npm run build` como comando de build.
+6. Use `dist` como diretório de saída.
+7. Selecione Node.js 24 nas configurações do projeto.
+8. Clique em **Deploy**.
+
+A Vercel fornecerá HTTPS e um domínio `vercel.app`. Commits posteriores enviados para a branch configurada gerarão novos deploys automaticamente.
+
+### Verificação antes do deploy
+
+```bash
+npm ci
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm run test:e2e
 ```
 
-### Como Usar (UI)
+Depois da publicação, teste busca, comparação, favoritos, temas, unidades, instalação da PWA e funcionamento offline. Também confirme no DevTools que o manifest e o service worker estão ativos.
 
-1. **Buscar cidade principal**: digite no campo superior e escolha um resultado.
-2. **Comparar (opcional)**: use o campo “Comparar com” e selecione outra cidade; linhas tracejadas aparecem no gráfico e um badge indica a cidade comparada.
-3. **Limpar comparação**: clique em “Limpar comparação” para voltar ao modo simples.
-4. **AQI**: o cartão “Qualidade do Ar” mostra o valor mais recente do US AQI (se disponível para a região).
+## APIs e dados
 
-## 📱 Compatibilidade
+- [Open-Meteo Weather Forecast](https://open-meteo.com/en/docs)
+- [Open-Meteo Air Quality](https://open-meteo.com/en/docs/air-quality-api)
+- [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api)
 
-- ✅ Chrome 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ Edge 90+
-- ✅ Dispositivos móveis (iOS/Android)
+Os dados meteorológicos e de qualidade do ar são produzidos por modelos numéricos. Eles não representam uma estação ou sensor instalado exatamente na cidade pesquisada. A cobertura e a resolução do AQI podem variar por região.
 
-## 🎓 Aprendizados
+## Privacidade e segurança
 
-Este projeto demonstra:
+- Não há contas, cookies de rastreamento ou ferramentas de analytics.
+- Nenhuma chave ou segredo é necessário.
+- Os dados locais podem ser removidos pela própria interface.
+- Conteúdo recebido das APIs é validado antes da renderização.
+- A Content Security Policy limita scripts, imagens, workers e conexões externas.
+- A localização é solicitada somente depois de uma explicação clara ao usuário.
 
-1. **Consumo de APIs REST**: Fetch API com async/await
-2. **Manipulação do DOM**: JavaScript vanilla moderno
-3. **Data Visualization**: Integração com Chart.js
-4. **CSS Grid & Flexbox**: Layout responsivo profissional
-5. **ES6+ Features**: Arrow functions, destructuring, modules
-6. **Best Practices**: Código limpo, comentado e organizado
+## Acessibilidade
 
-## 📈 Melhorias Futuras
- 
-- [ ] Persistir cidade favorita e última comparação no LocalStorage
-- [ ] Previsão estendida (7 dias) e cartão de tendência
-- [ ] Suporte a 3+ cidades em modo comparativo
-- [ ] PWA (offline para último snapshot)
-- [ ] Testes unitários / e2e
-- [ ] Internacionalização (i18n)
-- [ ] Toggle Dark/Light
+A interface inclui labels, regiões de status com `aria-live`, foco visível, link de salto, navegação completa por teclado, combobox/listbox com semântica ARIA, contraste nos temas claro e escuro e suporte a `prefers-reduced-motion`.
 
-## 📄 Licença
+O conteúdo essencial do gráfico também está disponível em texto, permitindo consultar as informações sem depender exclusivamente da visualização em canvas.
 
-Este projeto é open source e está disponível sob a [Licença MIT](https://opensource.org/licenses/MIT).
+## Limitações conhecidas
 
-## 👤 Autor
+- A disponibilidade das consultas depende das APIs públicas da Open-Meteo.
+- O AQI pode não estar disponível para todas as regiões.
+- O modo offline exibe somente o último resultado da cidade principal e o identifica como desatualizado.
+- A localização atual é exibida com esse nome porque a aplicação não utiliza geocodificação reversa.
+- Geolocalização, service worker e instalação como PWA exigem HTTPS em produção.
 
-**Bruno A. Vasconcellos**
+## Autor
 
-- GitHub: [Bruno Vasconcellos](https://github.com/BrunoAV1)
-- LinkedIn: [Bruno Vasconcellos](www.linkedin.com/in/bruno-vasconcellos-360070351)
+Desenvolvido por **Bruno Araujo de Vasconcellos**.
 
-## 🙏 Agradecimentos
+## Licença
 
-- **Open-Meteo**: Pela API gratuita e confiável
-- **Chart.js**: Pela excelente biblioteca de visualização
-- **Comunidade Open Source**: Por inspiração e recursos
-
----
-
-**Feito com 💚 para um mundo mais sustentável**
+Este projeto está disponível sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE).
