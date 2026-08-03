@@ -11,6 +11,12 @@ Thumbs.db
 npm-debug.log*
 yarn-error.log*
 
-# Builds / vendors (not used, but safe)
+# Builds / dependencies
 dist/
 node_modules/
+
+# Test and compiler artifacts
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
