@@ -1,171 +1,132 @@
-# 🌿 EcoMonitor-BR
+# EcoMonitor 2.0
 
-Dashboard de monitoramento climático em tempo real de **qualquer cidade** (busca global), com comparação lado a lado e qualidade do ar.
+Um dashboard ambiental global para entender as condições de uma cidade agora, antecipar as próximas horas e comparar localidades sem perder o contexto de fuso horário.
 
-## 📋 Sobre o Projeto
+![EcoMonitor 2.0 em execução](docs/images/ecomonitor-2.0-dashboard.png)
 
-**EcoMonitor-BR** é um projeto de portfólio focado em "Tech for Good", que disponibiliza dados climáticos (temperatura, umidade, vento) e **qualidade do ar (US AQI)** em tempo real, com visualização interativa e comparação entre duas cidades.
+O EcoMonitor funciona inteiramente no navegador, usa fontes públicas e gratuitas da Open-Meteo e não exige conta, chave de API ou back-end próprio. A interface foi pensada para portfólio profissional, computadores modestos, telas pequenas e navegação sem mouse.
 
-## 🎯 Objetivos
+## Funcionalidades
 
-- **Sustentabilidade**: Promover consciência ambiental através da visualização de dados climáticos
-- **Acessibilidade**: Interface responsiva e fácil de usar
-- **Educação**: Democratizar o acesso a informações meteorológicas
-- **Portfolio**: Demonstrar habilidades em Frontend e Data Visualization
+- Condições atuais: temperatura, sensação, umidade, vento/direção, precipitação, condição WMO, dia/noite, horário local e atualização.
+- Próximas 24 horas: resumo rolável e gráfico de temperatura/probabilidade de precipitação com período correto.
+- Sete dias: mínima, máxima, precipitação, condição predominante, nascer e pôr do sol.
+- Qualidade do ar: US AQI, PM2.5, PM10, classificação e recomendação ambiental não médica.
+- Busca global: dois comboboxes independentes, debounce, cancelamento, prevenção de resposta fora de ordem e teclado completo.
+- Comparação: diferenças resumidas, séries identificadas, inversão, limpeza e bloqueio da mesma cidade.
+- Preferências: unidades métricas/imperiais e temas claro, escuro ou automático.
+- Dados locais: última cidade, favoritos, recentes, limpeza e snapshot offline com aviso de desatualização.
+- Localização: explicação de privacidade antes de solicitar a permissão do navegador.
+- PWA: manifest, ícones, service worker e shell seguro em cache.
 
-## 🛠️ Stack Tecnológica
+## Stack
 
-- **HTML5**: Marcação semântica e estruturada
-- **CSS3**: Estilização moderna com Flexbox e Grid Layout
-- **JavaScript ES6+**: Lógica de aplicação puramente vanilla (sem frameworks)
-- **Chart.js**: Biblioteca de visualização de dados
-- **Open-Meteo API**: Fonte de dados meteorológicos (gratuita e sem chave de API)
+- Vite 8, TypeScript 6 e módulos ES.
+- HTML semântico e CSS próprio, sem framework de UI.
+- Chart.js 4 empacotado localmente.
+- Vitest para regressões unitárias.
+- Playwright + Chromium para fluxos end-to-end em desktop e celular.
+- ESLint 10 e Prettier.
 
-## 📁 Estrutura do Projeto
+## Arquitetura
 
+```text
+src/
+├── api/          # HTTP, URLs e normalização das respostas Open-Meteo
+├── components/   # combobox acessível e gráfico
+├── services/     # composição do dashboard e persistência local
+├── state/        # estado observável da aplicação
+├── styles/       # sistema visual responsivo
+├── types/        # contratos internos
+└── utils/        # AQI, datas, unidades, guardas e códigos WMO
+tests/
+├── unit/         # transformações e regressões
+└── e2e/          # fluxos completos com APIs determinísticas
+public/           # PWA, ícones e imagem social
+docs/             # auditoria, arquitetura, implantação e captura real
 ```
-ecomonitor-br/
-│
-├── index.html          # Página principal
-├── css/
-│   └── style.css       # Estilos com tema Eco/Dark Mode
-├── js/
-│   └── script.js       # Lógica da aplicação (fetch, AQI, comparação)
-├── assets/             # Recursos (imagens, ícones futuros)
-├── README.md           # Documentação
-└── .gitignore          # Itens ignorados no controle de versão
-```
 
-## 🚀 Funcionalidades
+Veja [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) para as decisões e o fluxo de dados.
 
-### ✅ Implementadas
+## Instalação
 
-- **Busca Global de Cidades**: Autocomplete via Open-Meteo Geocoding (sem chave)
-- **Qualidade do Ar (US AQI)**: Cartão dedicado com semáforo de saúde (bom, moderado, ruim)
-- **Modo Comparativo**: Sobreposição de duas cidades no mesmo gráfico (linhas tracejadas e badge de comparação)
-- **Gráfico Interativo 24h**: Temperatura, umidade e vento com múltiplos eixos
-- **Auto-atualização**: Refresh a cada 5 minutos para cidade principal e comparação
-- **Design Eco Dark Mode**: Layout responsivo, animações suaves e componentes acessíveis
+Requisitos: Node.js 24 ou superior e npm 11. A versão principal está registrada em `.nvmrc`.
 
-### 🎨 Design
-
-- **Paleta de Cores**:
-  - Verde principal: `#10b981` (Eco)
-  - Fundo escuro: `#0f172a` (Dark)
-  - Acentos: Laranja (temperatura), Azul (umidade), Roxo (vento)
-- **Tipografia**: System fonts para melhor performance
-- **Animações**: Transições suaves e micro-interações
-- **Responsividade**: Breakpoints em 768px e 480px
-
-## 📊 APIs Utilizadas
-
-**Open-Meteo Forecast** (meteo) — `https://api.open-meteo.com/v1/forecast`
-- `temperature_2m`: Temperatura a 2 metros do solo
-- `relative_humidity_2m`: Umidade relativa do ar
-- `wind_speed_10m`: Velocidade do vento a 10 metros
-
-**Open-Meteo Air Quality** (air-quality) — `https://air-quality-api.open-meteo.com/v1/air-quality`
-- `us_aqi`: Índice de qualidade do ar (US AQI)
-
-**Open-Meteo Geocoding** (geocoding) — `https://geocoding-api.open-meteo.com/v1/search`
-- Busca de cidades (name, latitude, longitude) — keyless
-
-> Todas as APIs são gratuitas e **não requerem chave**.
-
-## 🖥️ Como Executar
-
-### Opção 1: Servidor Local Simples
-
-1. Clone ou baixe o repositório
-2. Navegue até a pasta do projeto
-3. Execute um servidor HTTP local:
-
-**Python 3**:
 ```bash
-python -m http.server 8000
+npm install
+npm run dev
 ```
 
-**Node.js (http-server)**:
+Abra a URL informada pelo Vite. Não abra `index.html` diretamente: módulos, service worker e CSP dependem de HTTP/HTTPS.
+
+## Comandos
+
+| Comando             | Função                                 |
+| ------------------- | -------------------------------------- |
+| `npm run dev`       | servidor de desenvolvimento            |
+| `npm run typecheck` | validação TypeScript                   |
+| `npm run lint`      | análise estática                       |
+| `npm test`          | testes unitários                       |
+| `npm run test:e2e`  | testes Playwright em desktop e celular |
+| `npm run build`     | build de produção em `dist/`           |
+| `npm run preview`   | prévia local do build                  |
+| `npm run check`     | lint, tipos, unitários e build         |
+
+Na primeira execução dos E2E, instale o navegador:
+
 ```bash
-npx http-server -p 8000
+npx playwright install chromium
 ```
 
-**VS Code Live Server**:
-- Instale a extensão "Live Server"
-- Clique com o botão direito em `index.html`
-- Selecione "Open with Live Server"
+## Fontes dos dados
 
-4. Acesse `http://localhost:8000` no navegador
+- [Open-Meteo Weather Forecast](https://open-meteo.com/en/docs): clima atual, série horária e previsão diária.
+- [Open-Meteo Air Quality](https://open-meteo.com/en/docs/air-quality-api): US AQI, PM2.5 e PM10 modelados.
+- [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api): busca global baseada em GeoNames.
 
-### Opção 2: Abrir Diretamente
+Os timestamps chegam como Unix time e são formatados no fuso IANA retornado para a coordenada. Dados meteorológicos e de qualidade do ar são resultados de modelos/grades; não são sensores locais em tempo real.
 
-Como o projeto usa apenas JavaScript vanilla e APIs públicas, você pode abrir o arquivo `index.html` diretamente no navegador. Porém, alguns navegadores podem bloquear requisições CORS em arquivos locais.
+## Privacidade e segurança
 
-## 🔧 Configurações
+- Não existem cookies de rastreamento, analytics, contas, chaves ou segredos.
+- Preferências e snapshots ficam apenas no `localStorage` do dispositivo e podem ser removidos pela interface.
+- A localização é solicitada somente depois de uma explicação; coordenadas precisas dessa ação não são salvas como cidade recente.
+- Dados externos são validados e inseridos no DOM com `textContent`, nunca interpolados em `innerHTML`.
+- A CSP limita scripts, imagens, workers e conexões às origens necessárias. Em produção, prefira também enviar a política como header HTTP.
 
-### Intervalo de Atualização
+## Acessibilidade
 
-Edite em `js/script.js`:
+A interface oferece landmark semântico, link de salto, labels, status `aria-live`, foco visível, combobox/listbox conforme ARIA, setas/Enter/Escape, nomes acessíveis, contraste nos dois temas e `prefers-reduced-motion`. O gráfico possui alternativa nominal e os dados essenciais também existem em texto.
 
-```javascript
-const CONFIG = {
-    UPDATE_INTERVAL: 300000, // 5 minutos (em milissegundos)
-};
-```
+## Limitações
 
-### Como Usar (UI)
+- AQI é previsão modelada em grade; a resolução e cobertura variam por região.
+- Sem back-end, limites ou indisponibilidade da Open-Meteo afetam diretamente novas consultas.
+- O snapshot offline representa apenas a última cidade principal e é sempre marcado como desatualizado.
+- O service worker não armazena respostas das APIs; apenas o shell estático seguro é cacheado.
+- A ação de localização não executa geocodificação reversa, portanto a cidade é mostrada como “Localização atual”.
+- PWA e geolocalização exigem HTTPS em produção (localhost é permitido no desenvolvimento).
 
-1. **Buscar cidade principal**: digite no campo superior e escolha um resultado.
-2. **Comparar (opcional)**: use o campo “Comparar com” e selecione outra cidade; linhas tracejadas aparecem no gráfico e um badge indica a cidade comparada.
-3. **Limpar comparação**: clique em “Limpar comparação” para voltar ao modo simples.
-4. **AQI**: o cartão “Qualidade do Ar” mostra o valor mais recente do US AQI (se disponível para a região).
+## Publicação
 
-## 📱 Compatibilidade
+O projeto gera arquivos estáticos em `dist/` e usa caminhos relativos, funcionando na Vercel e no GitHub Pages. Consulte [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-- ✅ Chrome 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ Edge 90+
-- ✅ Dispositivos móveis (iOS/Android)
+## Roadmap
 
-## 🎓 Aprendizados
+- Internacionalização completa além de pt-BR.
+- Alertas meteorológicos oficiais quando existir uma fonte global gratuita e compatível.
+- Testes automatizados de contraste com uma ferramenta dedicada.
+- Opção explícita de exportar preferências e cidades salvas.
 
-Este projeto demonstra:
+## Documentação do projeto
 
-1. **Consumo de APIs REST**: Fetch API com async/await
-2. **Manipulação do DOM**: JavaScript vanilla moderno
-3. **Data Visualization**: Integração com Chart.js
-4. **CSS Grid & Flexbox**: Layout responsivo profissional
-5. **ES6+ Features**: Arrow functions, destructuring, modules
-6. **Best Practices**: Código limpo, comentado e organizado
+- [Auditoria da v1.0](docs/AUDIT.md)
+- [Plano da migração](UPGRADE_PLAN.md)
+- [Arquitetura](docs/ARCHITECTURE.md)
+- [Implantação](docs/DEPLOYMENT.md)
+- [Como contribuir](CONTRIBUTING.md)
+- [Histórico de mudanças](CHANGELOG.md)
 
-## 📈 Melhorias Futuras
- 
-- [ ] Persistir cidade favorita e última comparação no LocalStorage
-- [ ] Previsão estendida (7 dias) e cartão de tendência
-- [ ] Suporte a 3+ cidades em modo comparativo
-- [ ] PWA (offline para último snapshot)
-- [ ] Testes unitários / e2e
-- [ ] Internacionalização (i18n)
-- [ ] Toggle Dark/Light
+## Autoria e licença
 
-## 📄 Licença
-
-Este projeto é open source e está disponível sob a [Licença MIT](https://opensource.org/licenses/MIT).
-
-## 👤 Autor
-
-**Bruno A. Vasconcellos**
-
-- GitHub: [Bruno Vasconcellos](https://github.com/BrunoAV1)
-- LinkedIn: [Bruno Vasconcellos](www.linkedin.com/in/bruno-vasconcellos-360070351)
-
-## 🙏 Agradecimentos
-
-- **Open-Meteo**: Pela API gratuita e confiável
-- **Chart.js**: Pela excelente biblioteca de visualização
-- **Comunidade Open Source**: Por inspiração e recursos
-
----
-
-**Feito com 💚 para um mundo mais sustentável**
+Criado por **Bruno Araujo de Vasconcellos**. Distribuído sob a licença MIT.
