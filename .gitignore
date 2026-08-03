@@ -5,11 +5,24 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+*.swp
+*.swo
+*.tmp
+*.local
 
 # Logs
 *.log
 npm-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+
+# Local environment
+.env
+.env.*
+!.env.example
+.vercel/
+.vite/
+.vitest/
 
 # Builds / dependencies
 dist/
@@ -20,3 +33,5 @@ coverage/
 playwright-report/
 test-results/
 *.tsbuildinfo
+.cache/
+artifacts/
